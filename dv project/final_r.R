@@ -1,0 +1,172 @@
+
+
+library(readr)
+movie_cleaned <- read_csv("C:/Users/ALRYADA/Desktop/final1/movie_cleaned.csv")
+#View(movie_cleaned)
+movies2 <- read_csv("C:/Users/ALRYADA/Desktop/final1/movies_cleaned (1).csv")
+#View(movies2)
+#-------------------------------------------------------------------------------
+library(tidyverse)
+library(plotly)
+library(ggplot2)
+library(lubridate)
+library(fmsb)
+movies1 <- (movie_cleaned)
+#-------------------------------------------------------------------------------
+#best movie
+mv <- read.csv ("C:/Users/ALRYADA/Desktop/final1/movies_cleaned (1).csv", stringsAsFactors = FALSE)
+mv[,c("director", "profit_earned")] <- lapply(mv[,c("director", "profit_earned")], as.factor)
+top10 <- head(mv[order(mv$profit_earned, decreasing = TRUE), c("director", "profit_earned")], n = 10)
+top10
+top10$title <- reorder(top10$profit_earned, as.numeric(top10$direcor))
+top10$profit_earned <- paste(format(top10$profit_earned, trim = TRUE), "$")
+ggplot(top10, aes(director, profit_earned)) +
+  geom_col(position = "stack", aes(fill = director)) +
+  coord_flip() +
+  labs(x = "director Names", y = "profit_earned in USD", title = "Top 10 Movie with Most Revenues All Time")
+#-------------------------------------------------------------------------------
+budget1 <- round(movies1$budget / 1e8, 2)
+revenue1 <- round(movies1$revenue / 1e8, 2)
+#-------------------------------------------------------------------------------
+#dist of data
+summary(movies1)
+ggplot(aes(x = revenue), data = movies1) + geom_histogram(bins = 20, color = 'white') 
+summary(movies1$runtime)
+ggplot(aes(x = vote_average), data = movies1) + geom_histogram(bins = 20, color = 'white') 
++ ggtitle('Histogram of Scores')
+summary(movies1$vote_average)
+ggplot(aes(x = release_year), data = movies1) + geom_histogram(color='white') +
+  ggtitle('Histogram of release Year')
+boxplot(vote_average ~ release_year, data=movies1, col='indianred')
+title("vote average vs release year")
+#bar plot for genre
+p10 <- movies1 %>%
+  ggplot(aes(factor(genre)))+
+  geom_bar(aes(fill=factor(genre)))
+
+ggplotly(p10)
+#-------------------------------------------------------------------------------
+#random sample
+avatar <- data.frame(budget = c(40.7,4,20.1),
+                     revenue = c(4.781,0.014,4.6),
+                     vote_average = c(39.1,5,25))
+
+radarchart(avatar,
+           seg = 10,
+           title = "avatar",
+           pfcol = scales::alpha("black",0.9),
+           plwd = 2)
+#-------------------------------------------------------------------------------
+One_Direction <- data.frame(budget = c(50.7,4,20.1),
+                            revenue = c(800,0.014,4.6),
+                            vote_average = c(31.1,5,25))
+
+radarchart(One_Direction,
+           seg = 10,
+           title = "one direction",
+           pfcol = scales::alpha("black",0.9),
+           plwd = 2)
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+p1 <- movies1 %>%
+  ggplot(aes(budget1,revenue1,colour=genre))+
+  geom_point()+
+  geom_smooth(method = lm)
+ggplotly(p1)
+#-------------------------------------------------------------------------------
+p2 <- movies1 %>%
+  ggplot(aes(popularity,runtime))+
+  geom_point(aes(size= factor(genre)),alpha=0.5,color="#1F0C6F") +
+  theme_gray() +
+  geom_smooth(method= 0.5)+
+  facet_wrap(~vote_average)
+ggplotly(p2)
+#-------------------------------------------------------------------------------
+p3 <- movies1 %>%
+  filter(vote_average>7)%>%
+  ggplot(aes(popularity,runtime))+
+  geom_point(aes(size= factor(genre)),alpha=0.5,color="#ff0000") +
+  theme_classic() +
+  geom_smooth(method= 0.5)+
+  facet_wrap(~vote_average)
+ggplotly(p3)
+#-------------------------------------------------------------------------------
+p12 <- movies1 %>%
+  ggplot(aes(revenue,vote_average))+
+  geom_point(aes(size= factor(genre)),alpha=0.5,color="#1F0C6F") +
+  theme_classic() +
+  geom_smooth(method= 0.5)+
+  facet_wrap(~vote_average>7)
+ggplotly(p12)
+#-------------------------------------------------------------------------------
+p4 <- movies1 %>%
+  filter(vote_average>6)%>%
+  ggplot(aes(genre,budget))+
+  geom_point(aes(color=revenue,size= release_year ))+
+  geom_smooth()+facet_wrap(~vote_average)
+ggplotly(p4)
+#-------------------------------------------------------------------------------
+p5 <-movies1 %>%
+  filter(vote_average>5)%>%
+  filter(genre == "Action")%>%
+  ggplot(aes(factor(vote_average),revenue))+
+  geom_boxplot(aes(fill=factor(genre)))+
+  theme_dark()+coord_flip()
+ggplotly(p5)
+#-------------------------------------------------------------------------------
+p6 <-movies1 %>%
+  filter(vote_average>6)%>%
+  ggplot(aes(factor(vote_average),budget))+
+  geom_boxplot(aes(fill=factor(vote_average)))+
+  theme_dark()+coord_flip()
+
+ggplotly(p6)
+#-------------------------------------------------------------------------------
+p7 <- movies1 %>%
+  filter(release_year>2000)%>%
+  filter(vote_average>5)%>%
+  ggplot(aes(factor(vote_average)))+
+  geom_bar(aes(fill=factor(genre)))
+ggplotly(p7)
+#-------------------------------------------------------------------------------
+p8 <- movies1 %>%
+  ggplot(aes(factor(release_year)))+
+  geom_bar(aes(fill=factor(budget1)))
+
+ggplotly(p8)
+#-------------------------------------------------------------------------------
+p9 <- movies1 %>%
+  ggplot(aes(vote_average))+
+  geom_histogram(aes(fill=factor(popularity)),binwidth = 1)
+
+ggplotly(p9)
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+ggplot(data = movies1, aes(x = vote_average, y = budget1, colour = genre, size = budget1 )) + geom_point()
+ggplot(data = movies1, aes(x = vote_average, y = revenue1, colour = genre, size = budget1 )) + geom_point()
+ggplot(data = movies1) + geom_histogram(binwidth =0.5, aes(x = vote_average, fill = genre), colour = "black")
+#-------------------------------------------------------------------------------
+ggplot(data = movies1, aes(x=genre, y= vote_average, colour = genre )) + 
+  geom_jitter() + geom_boxplot(alpha = 0.5)
+#-------------------------------------------------------------------------------
+#scaling data
+#-------------------------------------------------------------------------------
+imdb <- read_csv("C:/Users/ALRYADA/Desktop/final1/Movie Ratings.csv")
+View(imdb)
+colnames(imdb) <- c("Film","Genre","CriticRating","AudienceRating","BudgetInMillions","Year")
+#-------------------------------------------------------------------------------
+ggplot(data = imdb, aes(x=CriticRating, y= AudienceRating, colour = Genre )) + geom_smooth(fill = NA)
+
+ggplot(data=imdb,aes(x=BudgetInMillions)) + geom_histogram(binwidth=10,color='black',aes(fill = Genre))+
+  facet_grid(Genre~.,scales = 'free')
+
+
+ggplot(data = imdb, aes(x= AudienceRating, y = CriticRating, colour = Genre)) +
+  geom_point() + facet_grid(Genre~.)
+
+ggplot(data = imdb, aes(x= CriticRating , y =AudienceRating , colour = Genre)) +
+  geom_point() + geom_smooth()  + facet_grid(Genre~Year) + coord_cartesian(ylim=c(0,100))
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
